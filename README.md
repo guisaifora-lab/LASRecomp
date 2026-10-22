@@ -8,6 +8,14 @@
 > in the controversy in relation to this project. You may simply ignore this project and its code.
 > As with anything on the internet, you run the code at your own discretion.
 
+> [!NOTE]
+> **This fork runs on CPUs without AVX2** (e.g. Ivy Bridge / Sandy Bridge: Core i7-3770, Xeon E5 v2). The game code
+> is compiled at setup for the player's own CPU: AVX2 + FMA where available (as upstream), otherwise the best of
+> SSE4.2 / AVX / F16C / FMA the CPU has (Ivy Bridge: `x86-64-v2+avx+f16c`), down to plain SSE2. Without the FMA
+> instruction, fused multiply-adds use an exact fast emulation (runtime/simd.h `SIMD_FMA`), verified against
+> Unicorn with `tools/test_simd.py` and `tools/test_fma_emu.c`. Windows builds: the "Windows build" workflow
+> (Actions tab) produces the release zip.
+
 **LAS Recomp** is a static recompilation of *The Legend of Zelda: Link's Awakening* (Nintendo Switch, 2019) into a
 native Windows, macOS and Linux application.
 
@@ -131,7 +139,7 @@ Python 3.12.
 
 ### Windows
 
-Requirements: Windows 10+ x86-64, a CPU with AVX2 and a GPU with Vulkan 1.3. More detail in
+Requirements: Windows 10+ x86-64 (any x86-64 CPU; AVX2 is not required) and a GPU with Vulkan 1.3. More detail in
 [docs/BUILD-windows.md](docs/BUILD-windows.md).
 
 1. One-time setup, in PowerShell from the repo root: `powershell -ExecutionPolicy Bypass -File tools\setup_windows.ps1`.
@@ -145,7 +153,7 @@ Requirements: Windows 10+ x86-64, a CPU with AVX2 and a GPU with Vulkan 1.3. Mor
 
 ### Linux
 
-Requirements: x86-64 with AVX2 (or aarch64, experimental), a GPU with Vulkan 1.3, clang, SDL 3, FFmpeg, shaderc and
+Requirements: x86-64 (any CPU; AVX2 is not required) or aarch64 (experimental), a GPU with Vulkan 1.3, clang, SDL 3, FFmpeg, shaderc and
 Vulkan Memory Allocator from your distribution, Python 3.12. Packages, cross builds and details in
 [docs/linux.md](docs/linux.md).
 
