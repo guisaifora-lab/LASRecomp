@@ -1,55 +1,50 @@
-# LAS Recomp — edição sem AVX2 / No-AVX2 edition
+# LAS Recomp — No-AVX2 Edition
 
-**Fork não oficial** do [LAS Recomp](https://github.com/peiikai/LASRecomp) (de [@peiikai](https://github.com/peiikai))
-que roda em **processadores sem AVX2**, como Intel Ivy Bridge e Sandy Bridge (Core i7-3770, i5-3470, Xeon E5-2690 v2
-e parecidos). Todo o resto é o projeto original.
-
-*Unofficial fork of [LAS Recomp](https://github.com/peiikai/LASRecomp) that runs on **CPUs without AVX2**
-(Ivy Bridge / Sandy Bridge and older). Everything else is the upstream project. English summary below.*
+An **unofficial fork** of [LAS Recomp](https://github.com/peiikai/LASRecomp) by [@peiikai](https://github.com/peiikai)
+that runs on **CPUs without AVX2**, such as Intel Ivy Bridge and Sandy Bridge (Core i7-3770, i5-3470, Xeon E5-2690 v2
+and similar). Everything else is the upstream project.
 
 ### ⬇️ Download (Windows)
 
-**[Baixar a versão mais recente / Download the latest release](https://github.com/guisaifora-lab/LASRecomp/releases/latest)**
-→ arquivo `LAS.Recomp-…-windows.zip`
+**[Download the latest release](https://github.com/guisaifora-lab/LASRecomp/releases/latest)** → `LAS.Recomp-…-windows.zip`
 
-### O que muda nesta versão
+### What's different in this fork
 
-| | Original | Este fork |
+| | Upstream | This fork |
 |---|---|---|
-| Processador | Precisa de AVX2 (Haswell / 2013 em diante) | **Qualquer x86-64**; com AVX2 continua igual ao original |
-| Como o jogo é compilado | Sempre para AVX2 + FMA | **Para o seu processador**, detectado na instalação (ex.: Ivy Bridge → SSE4.2 + AVX + F16C) |
-| Sem a instrução FMA | — | Substituta **exata e rápida** (~140× mais rápida que a alternativa padrão) |
-| Arquivos do jogo | Pasta com `exefs` e `romfs` | Também aceita um **`.zip`** com essas pastas; acha a versão 1.0.0 mesmo junto com uma atualização |
+| CPU | Needs AVX2 (Haswell / 2013 or newer) | **Any x86-64 CPU**; with AVX2 it's the same as upstream |
+| How the game code is compiled | Always for AVX2 + FMA | **For your own CPU**, detected at setup (e.g. Ivy Bridge → SSE4.2 + AVX + F16C) |
+| Without the FMA instruction | — | **Exact, fast** replacement (~140× faster than the standard library fallback) |
+| Game files | A folder with `exefs` and `romfs` | Also accepts a **`.zip`** of those folders; finds v1.0.0 even next to an update |
 
-A precisão foi conferida com o teste do próprio projeto (comparação com um processador ARM emulado), rodando num
-**Ivy Bridge emulado**: zero diferenças.
+Accuracy was checked with the project's own test suite (compared against an emulated ARM CPU), running on an
+**emulated Ivy Bridge CPU**: zero differences.
 
-### Como jogar
+### How to play
 
-1. Baixe o `.zip` acima e extraia numa pasta sua (ex.: `C:\Jogos\`), **fora** de "Arquivos de Programas".
-2. Abra o `lasrecomp.exe`. Se o Windows avisar "O Windows protegeu o computador": **Mais informações → Executar assim
-   mesmo** (o programa não tem assinatura digital).
-3. Em **Game files folder**, escolha a pasta com `exefs` e `romfs` do *Link's Awakening* **versão 1.0.0, sem
-   atualizações** (ou use **Or a .zip of them**).
-4. Clique em **Set up game files** e espere alguns minutos (precisa de ~12 GB livres). O jogo é recompilado para o
-   seu processador.
-5. Jogue! **F1** (ou Minus + Plus no controle) abre o menu de opções.
+1. Download the `.zip` above and extract it to a folder of your own (e.g. `C:\Games\`), **not** under Program Files.
+2. Open `lasrecomp.exe`. If Windows shows "Windows protected your PC": **More info → Run anyway** (the app isn't
+   digitally signed).
+3. Under **Game files folder**, choose the folder with `exefs` and `romfs` of *Link's Awakening* **version 1.0.0,
+   without updates** (or use **Or a .zip of them**).
+4. Click **Set up game files** and wait a few minutes (needs about 12 GB free). The game is recompiled for your CPU.
+5. Play! **F1** (or Minus + Plus on a controller) opens the options menu.
 
-**Requisitos:** Windows 10 ou 11 (64 bits), qualquer processador x86-64 e uma **placa de vídeo com Vulkan 1.3**.
+**Requirements:** Windows 10 or 11 (64-bit), any x86-64 CPU and a **GPU with Vulkan 1.3**.
 
 > [!WARNING]
-> **Nenhum arquivo do jogo vem incluído.** Você precisa da sua própria cópia legítima, já extraída (pastas `exefs` e
-> `romfs`). Arquivos **NSP, XCI, NCA e NSZ não são aceitos**, e este fork **não** descriptografa jogos nem usa
-> `prod.keys`, assim como o projeto original.
+> **No game files are included.** You need your own legally obtained copy, already extracted (`exefs` and `romfs`
+> folders). **NSP, XCI, NCA and NSZ files are not accepted**, and this fork does **not** decrypt games or use
+> `prod.keys`, just like upstream.
 
-### Problemas?
+### Problems?
 
-Abra uma [issue neste fork](https://github.com/guisaifora-lab/LASRecomp/issues) anexando o `lasrecomp.log` (fica na
-pasta do jogo). Problemas que também acontecem no original são do projeto original:
-[issues do LAS Recomp](https://github.com/peiikai/LASRecomp/issues).
+Open an [issue on this fork](https://github.com/guisaifora-lab/LASRecomp/issues) and attach `lasrecomp.log` (it's in
+the game folder). Problems that also happen with upstream belong to the original project:
+[LAS Recomp issues](https://github.com/peiikai/LASRecomp/issues).
 
 <details>
-<summary><b>English summary</b></summary>
+<summary><b>Technical details</b></summary>
 
 - **Runs on any x86-64 CPU.** At setup, the game code is compiled for the player's own CPU: x86-64-v3 (AVX2 + FMA)
   where available, exactly as upstream; otherwise the best of SSE4.2 / AVX / F16C / FMA the CPU has (Ivy Bridge:
@@ -68,7 +63,7 @@ pasta do jogo). Problemas que também acontecem no original são do projeto orig
 
 ---
 
-*Abaixo, o README original do projeto / Below, the upstream README:*
+*Below: the upstream README.*
 
 > [!IMPORTANT]
 > **This project was made almost exclusively with AI.** Nearly all of the code, tooling, reverse engineering and
