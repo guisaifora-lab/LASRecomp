@@ -213,7 +213,7 @@ SI int simd_fe_mode(uint64_t fpcr) {
 // older than Haswell / Piledriver) a single-precision fma is still exact and fast: the product of two floats is exact
 // in double, so a*b + c rounded once to double and then to float is the correctly rounded result, except when the
 // double lands exactly on a float rounding midpoint (double rounding: low 29 bits 1000...0) or in the float subnormal
-// range. Those rare lanes (and doubles) take libm's correctly rounded fma. Directed rounding modes compose exactly
+// range: those rare lanes take simd_fmaf_exact. Doubles take libm's fma. Directed rounding modes compose exactly
 // (round twice toward the same side = round once), so the FPCR RMode slow paths stay correct too.
 #if (defined(__x86_64__) || defined(__i386__)) && !defined(__FMA__)
 typedef double simd_vd4 __attribute__((vector_size(32)));
@@ -224,7 +224,19 @@ SI int simd_fmaf_hard(double s) {  // s needs the exact path (midpoint, or a non
     uint64_t m = u & 0x7fffffffffffffffull;
     return (u & 0x1fffffffull) == 0x10000000ull || (m - 1 < 0x3810000000000000ull - 1);  // 0 < |s| < 2^-126
 }
-SN float simd_fmaf_exact(float a, float b, float c) { return fmaf(a, b, c); }
+// The rare lanes, still without libm (it may not honour MXCSR's FTZ / DAZ the way the instruction does): in a directed
+// rounding mode the double result already rounds correctly; in round-to-nearest it's made round-to-odd first (TwoSum
+// gives the exact error), which then rounds to float correctly at any precision, subnormals included.
+SN float simd_fmaf_exact(float a, float b, float c) {
+    double p = (double)a * (double)b, z = (double)c, s = p + z;
+    if ((__builtin_ia32_stmxcsr() >> 13 & 3) != 0 || s != s || s - s != 0) return (float)s;
+    double t = s - p, e = (p - (s - t)) + (z - t);  // s + e == a*b + c exactly
+    uint64_t u;
+    memcpy(&u, &s, sizeof u);
+    if (e != 0 && !(u & 1)) u += (e > 0) == (s > 0) ? 1 : (uint64_t)-1;
+    memcpy(&s, &u, sizeof s);
+    return (float)s;
+}
 SI float simd_fmaf(float a, float b, float c) {
     double s = (double)a * (double)b + (double)c;
     if (__builtin_expect(simd_fmaf_hard(s), 0)) return simd_fmaf_exact(a, b, c);
@@ -232,7 +244,7 @@ SI float simd_fmaf(float a, float b, float c) {
 }
 SN vf32 simd_vfmaf_exact(vf32 a, vf32 b, vf32 c, vf32 r, vs32 bad) {
     for (int i = 0; i < 4; i++)
-        if (bad[i]) r[i] = fmaf(a[i], b[i], c[i]);
+        if (bad[i]) r[i] = simd_fmaf_exact(a[i], b[i], c[i]);
     return r;
 }
 SI vf32 simd_vfmaf(vf32 a, vf32 b, vf32 c) {

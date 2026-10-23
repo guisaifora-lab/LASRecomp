@@ -52,8 +52,9 @@ the game folder). Problems that also happen with upstream belong to the original
   CPU is rebuilt instead of crashing (`runtime/gamelib.c` `gamelib_cpu`).
 - **Exact fast FMA emulation** without the FMA instruction (`runtime/simd.h` `SIMD_FMA`): the product of two floats is
   exact in double, so one double rounding gives the correctly rounded result except on float rounding midpoints and
-  float subnormals, which fall back to libm. Verified with `tools/test_simd.py` against Unicorn (also under
-  `qemu-x86_64 -cpu IvyBridge-v1` via `LAS_TEST_WRAP`) and `tools/test_fma_emu.c` (16M cases, all rounding modes).
+  float subnormals, which are made round-to-odd with TwoSum first (no libm). Verified with `tools/test_simd.py`
+  against Unicorn (also under `qemu-x86_64 -cpu IvyBridge-v1` via `LAS_TEST_WRAP`), `tools/test_fma_emu.c` (16M
+  cases, all rounding modes) and `tools/test_fma_hw.c` (bit-identical to the FMA instruction, FTZ/DAZ on and off).
 - **Setup accepts a `.zip`** of `exefs/` + `romfs/` (system extractor: Windows `tar.exe`, bsdtar, 7z, unzip, Python),
   and prefers the v1.0.0 `exefs` when an update sits next to the base game. No NSP/XCI support, no decryption.
 - The prebuilt zig runtime in the Windows release targets baseline x86-64 (`tools/zig_slim.sh`).
